@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SizeMyPump Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function toggleFrictionInputs() {
+            var methodSelect = document.getElementById('friction_method');
+            if (!methodSelect) return; 
+            var method = methodSelect.value;
+            var hwInputs = document.getElementById('hazen_williams_inputs');
+            var cwInputs = document.getElementById('colebrook_white_inputs');
+
+            if (hwInputs && cwInputs) { 
+                if (method === 'hazen_williams') {
+                    hwInputs.style.display = 'block';
+                    cwInputs.style.display = 'none';
+                } else if (method === 'colebrook_white') {
+                    hwInputs.style.display = 'none';
+                    cwInputs.style.display = 'block';
+                } else { 
+                    hwInputs.style.display = 'none';
+                    cwInputs.style.display = 'block';
+                }
+            }
+        }
+
+        window.onload = function() {
+            toggleFrictionInputs();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>SizeMyPump - Fluid Dynamics Calculator</h1>
+
+        {% if error_message %}
+            <div class="error-message">{{ error_message }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <fieldset>
+                <legend>Flowrate</legend>
+                <label for="flowrate">Flowrate Value & Unit:</label> <!-- Updated label -->
+                <div class="input-group">
+                    <input type="number" step="any" id="flowrate" name="flowrate" value="{{ form_data.get('flowrate', '100') }}" required>
+                    <select id="flowrate_unit" name="flowrate_unit">
+                        <option value="m3/h" {% if form_data.get('flowrate_unit', 'm3/h') == 'm3/h' %}selected{% endif %}>m³/h</option>
+                        <option value="m3/s" {% if form_data.get('flowrate_unit') == 'm3/s' %}selected{% endif %}>m³/s</option>
+                        <option value="l/s" {% if form_data.get('flowrate_unit') == 'l/s' %}selected{% endif %}>l/s</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Pipe Diameter</legend>
+                <label for="diameter">Diameter Value & Unit:</label> <!-- Updated label -->
+                <div class="input-group">
+                    <input type="number" step="any" id="diameter" name="diameter" value="{{ form_data.get('diameter', '100') }}" required>
+                    <select id="diameter_unit" name="diameter_unit">
+                        <option value="mm" {% if form_data.get('diameter_unit', 'mm') == 'mm' %}selected{% endif %}>mm</option>
+                        <option value="m" {% if form_data.get('diameter_unit') == 'm' %}selected{% endif %}>m</option>
+                        <option value="in" {% if form_data.get('diameter_unit') == 'in' %}selected{% endif %}>in</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Elevations & Pipe Length</legend>
+                <label for="suction_elev">Suction Water Surface Elevation (m, relative to pump datum):</label>
+                <input type="number" step="any" id="suction_elev" name="suction_elev" value="{{ form_data.get('suction_elev', '0') }}" required>
+                
+                <label for="discharge_elev">Discharge Point Elevation (m, relative to pump datum):</label>
+                <input type="number" step="any" id="discharge_elev" name="discharge_elev" value="{{ form_data.get('discharge_elev', '10') }}" required>
+                
+                <label for="pipe_length">Total Pipe Length (m):</label>
+                <input type="number" step="any" id="pipe_length" name="pipe_length" value="{{ form_data.get('pipe_length', '100') }}" required min="0.01">
+            </fieldset>
+
+            <fieldset>
+                <legend>Pressure Conditions (Gauge)</legend>
+                <label for="p_suction_gauge_bar">Pressure at Suction Source (bar, gauge - e.g. 0 for open tank):</label>
+                <input type="number" step="any" id="p_suction_gauge_bar" name="p_suction_gauge_bar" value="{{ form_data.get('p_suction_gauge_bar', '0') }}" required>
+                
+                <label for="p_discharge_gauge_bar">Required Pressure at Discharge Point (bar, gauge):</label>
+                <input type="number" step="any" id="p_discharge_gauge_bar" name="p_discharge_gauge_bar" value="{{ form_data.get('p_discharge_gauge_bar', '0') }}" required>
+            </fieldset>
+
+            <fieldset>
+                <legend>Friction Calculation</legend>
+                <label for="friction_method">Friction Method:</label>
+                <select id="friction_method" name="friction_method" onchange="toggleFrictionInputs()">
+                    <option value="colebrook_white" {% if form_data.get('friction_method', 'colebrook_white') == 'colebrook_white' %}selected{% endif %}>Colebrook-White</option>
+                    <option value="hazen_williams" {% if form_data.get('friction_method') == 'hazen_williams' %}selected{% endif %}>Hazen-Williams</option>
+                </select>
+
+                <div id="hazen_williams_inputs"> 
+                    <label for="hazen_williams_c">Hazen-Williams C factor:</label>
+                    <input type="number" step="any" id="hazen_williams_c" name="hazen_williams_c" value="{{ form_data.get('hazen_williams_c', '130') }}">
+                </div>
+                <div id="colebrook_white_inputs"> 
+                    <label for="pipe_roughness_mm">Pipe Roughness (mm):</label>
+                    <input type="number" step="any" id="pipe_roughness_mm" name="pipe_roughness_mm" value="{{ form_data.get('pipe_roughness_mm', '0.05') }}">
+                </div>
+            </fieldset>
+            
+            <fieldset>
+                <legend>Pump & System Parameters</legend>
+                <label for="pump_efficiency">Pump Efficiency (%):</label>
+                <input type="number" step="any" id="pump_efficiency" name="pump_efficiency" value="{{ form_data.get('pump_efficiency', '75') }}" required min="0.01" max="100">
+                
+                <label for="operating_hours">Operating Hours:</label>
+                <input type="number" step="any" id="operating_hours" name="operating_hours" value="{{ form_data.get('operating_hours', '8') }}" required min="0">
+                
+                <label for="unit_cost_electricity">Unit Cost of Electricity (e.g., UGX/kWh):</label>
+                <input type="number" step="any" id="unit_cost_electricity" name="unit_cost_electricity" value="{{ form_data.get('unit_cost_electricity', '500') }}" required min="0">
+                
+                <label for="reservoir_liters">Reservoir Capacity (Liters):</label>
+                <input type="number" step="any" id="reservoir_liters" name="reservoir_liters" value="{{ form_data.get('reservoir_liters', '10000') }}" required min="0">
+            </fieldset>
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        {% if results %}
+        <div class="results-section">
+            <h2>Calculation Results</h2>
+            <div class="results-grid">
+                <div><h3>Fluid Properties</h3>
+                    <p>Flowrate: {{ results.flowrate_m3h }} m³/h ({{ results.flowrate_m3s }} m³/s)</p>
+                    <p>Diameter: {{ results.diameter_in }} in = {{ results.diameter_mm }} mm = {{ results.diameter_m }} m</p>
+                    <p>Pipe Area: {{ results.pipe_area_m2 }} m²</p>
+                    <p>Velocity: {{ results.velocity_ms }} m/s</p>
+                    <p>Reynolds Number: {{ results.reynolds_number }} → {{ results.flow_type }}</p>
+                    <p>Kinematic Viscosity: {{ results.kin_viscosity_m2s }} m²/s</p>
+                </div>
+
+                <div><h3>Head Calculations</h3>
+                    <p>Static Head (Hs): {{ results.static_head_m }} m</p>
+                    <p>Velocity Head (Hv): {{ results.velocity_head_m }} m</p>
+                    <p>Friction Factor (λ): {{ results.friction_factor_lambda }}</p>
+                    <p>Friction Head (Hf): {{ results.friction_head_m }} m</p>
+                    <p>Friction Slope (Sf): {{ results.friction_slope }}</p>
+                    <p>Pressure Head Difference (Hp_d): {{ results.pressure_head_diff_m }} m</p>
+                    <p>Total Head (H): {{ results.total_head_m }} m</p>
+                    <p>NPSH Available: {{ results.npsh_available_m }} m</p>
+                    <p>Reynolds Roughness (Re*): {{ results.reynolds_roughness_Re_star }} → {{ results.turbulence_type }}</p>
+                </div>
+
+                <div><h3>Power and Efficiency</h3>
+                    <p>Hydraulic Power: {{ results.hydraulic_power_kw }} kW</p>
+                    <p>Pump Efficiency: {{ results.pump_efficiency_percent }}%</p>
+                    <p>Pump Shaft Power: {{ results.pump_shaft_power_kw }} kW</p>
+                    <p>Assumed Motor Efficiency: {{ results.motor_efficiency_assumed_percent }}%</p>
+                    <p>Overall Efficiency: {{ results.overall_efficiency_percent }}%</p>
+                    <p>Actual Electrical Power Demand: {{ results.actual_electrical_power_kw }} kW</p>
+                    <p>Energy Consumed: {{ results.energy_consumed_kwh }} kWh</p>
+                    <p>Power Cost: {{ results.power_cost }} (currency)</p>
+                </div>
+                
+                <div><h3>Reservoir (Tank) Fill Time</h3>
+                    <p>Reservoir Capacity: {{ results.reservoir_liters }} L</p>
+                    <p>Time to Fill: {{ results.fill_time_hr }} h = {{ results.fill_time_min }} min = {{ results.fill_time_sec }} sec</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="plots-section">
+            <h2>Result Plots</h2>
+            <div class="plots-grid">
+                {% for key, url in plot_urls.items() %}
+                <div class="plot-container">
+                    <img src="{{ url }}" alt="Plot for {{ key.replace('_', ' ')|title }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div> 
+</body>
+</html>

@@ -1,0 +1,193 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #e0f7fa; 
+    color: #004d40; 
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px; 
+    margin: 20px auto; 
+    background: #ffffff; 
+    padding: 25px 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 5px 15px rgba(0, 77, 64, 0.15); 
+    border: 1px solid #b2ebf2; 
+}
+
+h1 {
+    color: #00796b; 
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 2.2em; 
+    border-bottom: 2px solid #4db6ac; 
+    padding-bottom: 10px;
+}
+
+h2 {
+    color: #00897b; 
+    text-align: left; 
+    margin-top: 30px;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    border-bottom: 1px solid #80cbc4; 
+    padding-bottom: 8px;
+}
+
+h3 { 
+    color: #00695c; 
+    margin-top: 0;
+    border-bottom: 1px solid #b2dfdb; 
+    padding-bottom: 5px;
+    font-size: 1.3em;
+}
+
+form {
+    display: grid;
+    gap: 25px; 
+}
+
+fieldset {
+    border: 1px solid #80deea; 
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f0fbfc; 
+}
+
+legend {
+    font-weight: bold;
+    color: #00796b; 
+    padding: 0 10px; 
+    font-size: 1.1em;
+    background-color: #ffffff; 
+    border-radius: 4px;
+    border: 1px solid #80deea;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px; 
+    font-weight: 600; 
+    color: #004d40; 
+}
+
+/* Default styling for inputs and selects when NOT in an input-group */
+input[type="number"],
+select {
+    width: 100%; 
+    padding: 12px; 
+    margin-bottom: 10px; /* This margin will be overridden for items in .input-group */
+    border: 1px solid #4dd0e1; 
+    border-radius: 6px; 
+    box-sizing: border-box;
+    background-color: #ffffff;
+    color: #004d40;
+    font-size: 1em;
+}
+
+/* Styling for .input-group and its children */
+.input-group {
+    display: flex; /* Enables flexbox layout for children */
+    align-items: center; /* Vertically aligns items in the middle */
+    gap: 10px; /* Space between the number input and the select dropdown */
+    margin-bottom: 10px; /* Keep overall margin for the group */
+}
+
+.input-group input[type="number"] {
+    flex-grow: 1; /* Allows the number input to take up available space */
+    margin-bottom: 0; /* Remove individual bottom margin, handled by parent .input-group */
+    width: auto; /* Override default 100% width if set elsewhere for standalone inputs */
+}
+
+.input-group select {
+    min-width: 100px; /* Ensures the select dropdown has a reasonable minimum width */
+    margin-bottom: 0; /* Remove individual bottom margin */
+    width: auto; /* Allow select to size based on content and min-width */
+}
+
+
+button[type="submit"] {
+    background: linear-gradient(to right, #00796b, #009688); 
+    color: white;
+    padding: 14px 25px; 
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em; 
+    font-weight: bold;
+    transition: all 0.3s ease; 
+    width: 100%; 
+    box-sizing: border-box;
+    letter-spacing: 0.5px; 
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(to right, #00695c, #00897b); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); 
+    transform: translateY(-2px); 
+}
+
+.results-section, .plots-section {
+    margin-top: 35px;
+    padding: 25px;
+    background-color: #e0f7fa; 
+    border: 1px solid #4dd0e1; 
+    border-radius: 8px;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+    gap: 25px;
+}
+
+.results-grid div p { 
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 4px solid #00796b; 
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.plots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+    gap: 25px;
+    margin-top: 15px;
+}
+
+.plot-container {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 77, 64, 0.1);
+    border: 1px solid #b2ebf2;
+}
+
+.plot-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px; 
+    display: block; 
+    margin: auto; 
+}
+
+.error-message {
+    background-color: #ffcdd2; 
+    color: #c62828; 
+    padding: 15px;
+    border: 1px solid #ef9a9a; 
+    border-left: 5px solid #d32f2f; 
+    border-radius: 6px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 1.05em;
+}
