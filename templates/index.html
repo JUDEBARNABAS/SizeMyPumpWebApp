@@ -12,21 +12,16 @@
             var method = methodSelect.value;
             var hwInputs = document.getElementById('hazen_williams_inputs');
             var cwInputs = document.getElementById('colebrook_white_inputs');
-
             if (hwInputs && cwInputs) { 
                 if (method === 'hazen_williams') {
                     hwInputs.style.display = 'block';
                     cwInputs.style.display = 'none';
-                } else if (method === 'colebrook_white') {
-                    hwInputs.style.display = 'none';
-                    cwInputs.style.display = 'block';
-                } else { 
+                } else { // Default to Colebrook-White if not Hazen-Williams or if value is unexpected
                     hwInputs.style.display = 'none';
                     cwInputs.style.display = 'block';
                 }
             }
         }
-
         window.onload = function() {
             toggleFrictionInputs();
         };
@@ -43,7 +38,7 @@
         <form method="POST">
             <fieldset>
                 <legend>Flowrate</legend>
-                <label for="flowrate">Flowrate Value & Unit:</label> <!-- Updated label -->
+                <label for="flowrate">Flowrate Value & Unit:</label>
                 <div class="input-group">
                     <input type="number" step="any" id="flowrate" name="flowrate" value="{{ form_data.get('flowrate', '100') }}" required>
                     <select id="flowrate_unit" name="flowrate_unit">
@@ -56,7 +51,7 @@
 
             <fieldset>
                 <legend>Pipe Diameter</legend>
-                <label for="diameter">Diameter Value & Unit:</label> <!-- Updated label -->
+                <label for="diameter">Diameter Value & Unit:</label>
                 <div class="input-group">
                     <input type="number" step="any" id="diameter" name="diameter" value="{{ form_data.get('diameter', '100') }}" required>
                     <select id="diameter_unit" name="diameter_unit">
@@ -69,24 +64,17 @@
 
             <fieldset>
                 <legend>Elevations & Pipe Length</legend>
-                <label for="suction_elev">Suction Water Surface Elevation (m, relative to pump datum):</label>
+                <label for="suction_elev">Suction Point Elevation (m, relative to datum):</label> <!-- Clarified label -->
                 <input type="number" step="any" id="suction_elev" name="suction_elev" value="{{ form_data.get('suction_elev', '0') }}" required>
                 
-                <label for="discharge_elev">Discharge Point Elevation (m, relative to pump datum):</label>
+                <label for="discharge_elev">Discharge Point Elevation (m, relative to datum):</label> <!-- Clarified label -->
                 <input type="number" step="any" id="discharge_elev" name="discharge_elev" value="{{ form_data.get('discharge_elev', '10') }}" required>
                 
                 <label for="pipe_length">Total Pipe Length (m):</label>
                 <input type="number" step="any" id="pipe_length" name="pipe_length" value="{{ form_data.get('pipe_length', '100') }}" required min="0.01">
             </fieldset>
 
-            <fieldset>
-                <legend>Pressure Conditions (Gauge)</legend>
-                <label for="p_suction_gauge_bar">Pressure at Suction Source (bar, gauge - e.g. 0 for open tank):</label>
-                <input type="number" step="any" id="p_suction_gauge_bar" name="p_suction_gauge_bar" value="{{ form_data.get('p_suction_gauge_bar', '0') }}" required>
-                
-                <label for="p_discharge_gauge_bar">Required Pressure at Discharge Point (bar, gauge):</label>
-                <input type="number" step="any" id="p_discharge_gauge_bar" name="p_discharge_gauge_bar" value="{{ form_data.get('p_discharge_gauge_bar', '0') }}" required>
-            </fieldset>
+            <!-- REMOVED "Pressure Conditions (Gauge)" fieldset -->
 
             <fieldset>
                 <legend>Friction Calculation</legend>
@@ -137,13 +125,18 @@
                     <p>Kinematic Viscosity: {{ results.kin_viscosity_m2s }} m²/s</p>
                 </div>
 
-                <div><h3>Head Calculations</h3>
+                <div><h3>Head & Pressure Calculations</h3> <!-- Updated heading -->
                     <p>Static Head (Hs): {{ results.static_head_m }} m</p>
                     <p>Velocity Head (Hv): {{ results.velocity_head_m }} m</p>
-                    <p>Friction Factor (λ): {{ results.friction_factor_lambda }}</p>
                     <p>Friction Head (Hf): {{ results.friction_head_m }} m</p>
+                    <p>Friction Factor (λ): {{ results.friction_factor_lambda }}</p>
                     <p>Friction Slope (Sf): {{ results.friction_slope }}</p>
-                    <p>Pressure Head Difference (Hp_d): {{ results.pressure_head_diff_m }} m</p>
+                    <hr> <!-- Separator for pressures -->
+                    <p>Suction Pressure (Ps): {{ results.ps_bar }} bar</p>
+                    <p>Discharge Pressure (Pd): {{ results.pd_bar }} bar</p>
+                    <p>Differential Pressure (dP): {{ results.dp_bar }} bar</p>
+                    <p>Resultant Pressure Head (Hp): {{ results.hp_m }} m</p>
+                    <hr> <!-- Separator -->
                     <p>Total Head (H): {{ results.total_head_m }} m</p>
                     <p>NPSH Available: {{ results.npsh_available_m }} m</p>
                     <p>Reynolds Roughness (Re*): {{ results.reynolds_roughness_Re_star }} → {{ results.turbulence_type }}</p>
@@ -152,7 +145,8 @@
                 <div><h3>Power and Efficiency</h3>
                     <p>Hydraulic Power: {{ results.hydraulic_power_kw }} kW</p>
                     <p>Pump Efficiency: {{ results.pump_efficiency_percent }}%</p>
-                    <p>Pump Shaft Power: {{ results.pump_shaft_power_kw }} kW</p>
+                    <!-- UPDATED LABEL for Pump Brake Power -->
+                    <p>Pump Brake Power (Shaft Power): {{ results.pump_shaft_power_kw }} kW</p>
                     <p>Assumed Motor Efficiency: {{ results.motor_efficiency_assumed_percent }}%</p>
                     <p>Overall Efficiency: {{ results.overall_efficiency_percent }}%</p>
                     <p>Actual Electrical Power Demand: {{ results.actual_electrical_power_kw }} kW</p>
